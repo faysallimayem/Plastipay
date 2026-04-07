@@ -1,0 +1,25 @@
+node_modules/
+.env
+prisma/dev.db
+prisma/dev.db-journal
+dist/
+*.log
+
+# Flutter
+plastipay_app/.dart_tool/
+plastipay_app/.packages
+plastipay_app/.pub/
+plastipay_app/build/
+!plastipay_app/build/web/
+
+# ESP32
+esp32/**/build/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db

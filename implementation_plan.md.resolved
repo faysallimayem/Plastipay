@@ -1,0 +1,130 @@
+# ♻️ Système de Collecte de Bouteilles — Plan d'Implémentation
+
+Projet étudiant : machine de recyclage de bouteilles en Tunisie. Ce plan couvre le schéma BDD (ERD), le diagramme d'architecture, et le backend Node.js + Express.
+
+## Règles Métier (par défaut — à valider)
+
+| Règle | Valeur |
+|-------|--------|
+| Points par bouteille plastique | 10 pts |
+| Points par bouteille verre | 15 pts |
+| Café gratuit | 100 pts |
+| Réduction 10% | 50 pts |
+| Identification | QR Code via app |
+
+> [!IMPORTANT]
+> Ces valeurs sont des suggestions. Confirme-les ou ajuste-les selon tes besoins.
+
+---
+
+## A — Schéma de Base de Données
+
+### Tables
+
+| Table | Description |
+|-------|-------------|
+| `users` | Utilisateurs (étudiants, staff) |
+| `machines` | Machines de collecte installées |
+| `transactions` | Chaque dépôt de bouteille |
+| `rewards` | Récompenses disponibles |
+| `reward_redemptions` | Historique des échanges de points |
+
+### Relations clés
+- Un `user` a plusieurs `transactions`
+- Une `machine` a plusieurs `transactions`
+- Un `user` a plusieurs `reward_redemptions`
+- Une `reward` a plusieurs `reward_redemptions`
+
+---
+
+## B — Architecture du Système
+
+Le diagramme sera créé en Mermaid montrant les 4 couches :
+1. **Machine physique** (ESP32 + capteurs)
+2. **Backend API** (Node.js + Express + PostgreSQL)
+3. **App mobile** (Flutter — futur)
+4. **Admin Dashboard** (web — futur)
+
+---
+
+## D — Backend Node.js
+
+### Structure du projet
+
+```
+ons/
+├── package.json
+├── .env
+├── .gitignore
+├── prisma/
+│   └── schema.prisma          # Modèles de données
+├── src/
+│   ├── server.js              # Point d'entrée
+│   ├── config/
+│   │   └── database.js        # Config Prisma
+│   ├── middleware/
+│   │   ├── auth.js            # JWT middleware
+│   │   └── validate.js        # Validation
+│   ├── routes/
+│   │   ├── auth.routes.js     # Inscription / Connexion
+│   │   ├── points.routes.js   # Gestion des points
+│   │   ├── transaction.routes.js  # Historique
+│   │   ├── machine.routes.js  # Machines
+│   │   └── reward.routes.js   # Récompenses
+│   ├── controllers/
+│   │   ├── auth.controller.js
+│   │   ├── points.controller.js
+│   │   ├── transaction.controller.js
+│   │   ├── machine.controller.js
+│   │   └── reward.controller.js
+│   └── utils/
+│       └── helpers.js
+└── README.md
+```
+
+### Proposed Changes
+
+#### [NEW] Backend Node.js Project
+
+All files will be created in `c:\Users\R I B\OneDrive\Desktop\ons\`
+
+- **`package.json`** — Dépendances : express, prisma, bcryptjs, jsonwebtoken, cors, dotenv
+- **`prisma/schema.prisma`** — Modèles : User, Machine, Transaction, Reward, RewardRedemption
+- **`src/server.js`** — Serveur Express, routes, middleware
+- **`src/middleware/auth.js`** — Vérification JWT
+- **`src/routes/*.js`** — Routes API REST
+- **`src/controllers/*.js`** — Logique métier
+- **`.env`** — Variables d'environnement (DATABASE_URL, JWT_SECRET)
+
+### API Endpoints
+
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| POST | `/api/auth/register` | Inscription |
+| POST | `/api/auth/login` | Connexion |
+| GET | `/api/auth/profile` | Profil utilisateur |
+| POST | `/api/transactions` | Ajouter un dépôt (depuis machine) |
+| GET | `/api/transactions` | Historique des dépôts |
+| GET | `/api/points/balance` | Solde de points |
+| GET | `/api/rewards` | Liste des récompenses |
+| POST | `/api/rewards/redeem` | Échanger des points |
+| POST | `/api/machines` | Enregistrer une machine |
+| GET | `/api/machines` | Liste des machines |
+
+---
+
+## Verification Plan
+
+### Automated Tests
+1. **Démarrage du serveur** : `npm run dev` — vérifier que le serveur démarre sans erreur sur le port 3000
+2. **Test des routes API** : tester chaque endpoint avec des requêtes HTTP simples via le navigateur ou curl
+
+### Manual Verification
+1. Lancer le serveur avec `npm run dev`
+2. Tester l'inscription : `POST /api/auth/register` avec un body JSON
+3. Tester la connexion : `POST /api/auth/login` et vérifier le token JWT
+4. Tester l'ajout de transaction : `POST /api/transactions`
+5. Vérifier le solde de points : `GET /api/points/balance`
+
+> [!NOTE]
+> La base de données utilisera SQLite pour le développement (pas besoin d'installer PostgreSQL). On pourra migrer vers PostgreSQL pour la production plus tard.

@@ -1,0 +1,68 @@
+# ♻️ EcoCollect — Walkthrough
+
+## Ce qui a été accompli
+
+### A — Schéma de Base de Données (ERD) ✅
+Diagramme ERD complet avec **5 tables** et leurs relations dans [diagrams.md](file:///C:/Users/R%20I%20B/.gemini/antigravity/brain/1f6f161b-6aed-41a7-81ea-6657168a5e4a/diagrams.md) :
+- `users` — Utilisateurs avec rôle (user/admin) et solde de points
+- `machines` — Machines de collecte avec clé API et statut
+- `transactions` — Dépôts de bouteilles avec calcul automatique de points
+- `rewards` — Récompenses (café, réduction, cadeau)
+- `reward_redemptions` — Historique des échanges de points
+
+### B — Architecture du Système ✅
+Trois diagrammes dans [diagrams.md](file:///C:/Users/R%20I%20B/.gemini/antigravity/brain/1f6f161b-6aed-41a7-81ea-6657168a5e4a/diagrams.md) :
+- Diagramme ERD (relations entre tables)
+- Architecture globale (4 couches : Machine → Backend → Mobile → Admin)
+- Diagramme de séquence (flux complet d'un dépôt de bouteille)
+
+### D — Backend Node.js ✅
+Backend complet avec **12 endpoints API** :
+
+| Fichier | Description |
+|---------|-------------|
+| [server.js](file:///c:/Users/R%20I%20B/OneDrive/Desktop/ons/src/server.js) | Point d'entrée Express |
+| [schema.prisma](file:///c:/Users/R%20I%20B/OneDrive/Desktop/ons/prisma/schema.prisma) | 5 modèles de données |
+| [auth.controller.js](file:///c:/Users/R%20I%20B/OneDrive/Desktop/ons/src/controllers/auth.controller.js) | Inscription, connexion, profil |
+| [transaction.controller.js](file:///c:/Users/R%20I%20B/OneDrive/Desktop/ons/src/controllers/transaction.controller.js) | Dépôts de bouteilles, historique |
+| [points.controller.js](file:///c:/Users/R%20I%20B/OneDrive/Desktop/ons/src/controllers/points.controller.js) | Solde, classement |
+| [reward.controller.js](file:///c:/Users/R%20I%20B/OneDrive/Desktop/ons/src/controllers/reward.controller.js) | Récompenses, échange |
+| [machine.controller.js](file:///c:/Users/R%20I%20B/OneDrive/Desktop/ons/src/controllers/machine.controller.js) | Gestion des machines |
+
+---
+
+## Tests et Validation
+
+### ✅ npm install — 147 packages, 0 vulnérabilités
+### ✅ Base de données initialisée avec données de démo
+### ✅ Serveur démarré sur http://localhost:3000
+
+````carousel
+![Page d'accueil API — liste de tous les endpoints](C:/Users/R I B/.gemini/antigravity/brain/1f6f161b-6aed-41a7-81ea-6657168a5e4a/home_api_1773696005242.png)
+<!-- slide -->
+![Classement - Ahmed (60pts), Fatma (50pts), Youssef (10pts)](C:/Users/R I B/.gemini/antigravity/brain/1f6f161b-6aed-41a7-81ea-6657168a5e4a/leaderboard_api_1773695994699.png)
+````
+
+---
+
+## Comment utiliser
+
+```bash
+# Lancer le serveur
+npm run dev
+
+# Tester la connexion
+# POST http://localhost:3000/api/auth/login
+# Body: { "email": "ahmed@test.tn", "password": "user123" }
+
+# Voir le classement
+# GET http://localhost:3000/api/points/leaderboard
+
+# Voir l'interface BDD
+npm run db:studio
+```
+
+## Prochaines étapes possibles
+- 📱 App mobile Flutter
+- 🖥️ Dashboard admin web
+- 🔌 Code ESP32/Arduino pour la machine physique

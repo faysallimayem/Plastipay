@@ -1,0 +1,148 @@
+# ♻️ Diagrammes du Système — EcoCollect
+
+## A — Schéma de Base de Données (ERD)
+
+```mermaid
+erDiagram
+    USER {
+        int id PK
+        string email UK
+        string phone UK
+        string password_hash
+        string first_name
+        string last_name
+        int total_points
+        string role "user | admin"
+        datetime created_at
+        datetime updated_at
+    }
+
+    MACHINE {
+        int id PK
+        string name
+        string location
+        string serial_number UK
+        string api_key
+        string status "active | maintenance | offline"
+        datetime last_ping
+        datetime created_at
+    }
+
+    TRANSACTION {
+        int id PK
+        int user_id FK
+        int machine_id FK
+        int bottles_count
+        string bottle_type "plastic | glass"
+        int points_earned
+        datetime created_at
+    }
+
+    REWARD {
+        int id PK
+        string name
+        string description
+        int points_cost
+        string category "coffee | discount | gift"
+        boolean is_active
+        datetime created_at
+    }
+
+    REWARD_REDEMPTION {
+        int id PK
+        int user_id FK
+        int reward_id FK
+        int points_spent
+        string status "pending | completed | cancelled"
+        datetime created_at
+    }
+
+    USER ||--o{ TRANSACTION : "dépose des bouteilles"
+    MACHINE ||--o{ TRANSACTION : "enregistre les dépôts"
+    USER ||--o{ REWARD_REDEMPTION : "échange ses points"
+    REWARD ||--o{ REWARD_REDEMPTION : "est échangé"
+```
+
+### Points clés du schéma
+
+| Champ | Explication |
+|-------|-------------|
+| `User.total_points` | Solde actuel (mis à jour à chaque transaction) |
+| `Machine.api_key` | Clé secrète pour authentifier les requêtes de la machine |
+| `Transaction.points_earned` | Calculé automatiquement selon `bottle_type` |
+| `Reward.points_cost` | Coût en points pour obtenir la récompense |
+
+---
+
+## B — Architecture du Système
+
+```mermaid
+flowchart TB
+    subgraph MACHINE["🏭 Machine Physique"]
+        ESP["ESP32 / Arduino"]
+        IR["Capteur IR"]
+        WEIGHT["Capteur Poids HX711"]
+        LCD["Écran OLED"]
+        QR["Lecteur QR Code"]
+        
+        QR --> ESP
+        IR --> ESP
+        WEIGHT --> ESP
+        ESP --> LCD
+    end
+
+    subgraph BACKEND["🧠 Backend Node.js"]
+        API["Express API REST"]
+        AUTH["JWT Auth"]
+        DB["SQLite / PostgreSQL"]
+        PRISMA["Prisma ORM"]
+        
+        API --> AUTH
+        API --> PRISMA
+        PRISMA --> DB
+    end
+
+    subgraph MOBILE["📱 App Mobile (futur)"]
+        FLUTTER["Flutter App"]
+        SCAN["Scanner QR"]
+        POINTS["Voir Points"]
+        HISTORY["Historique"]
+    end
+
+    subgraph ADMIN["🖥️ Admin (futur)"]
+        DASHBOARD["Dashboard Web"]
+        STATS["Statistiques"]
+    end
+
+    ESP -- "POST /api/transactions\n(HTTP REST)" --> API
+    FLUTTER -- "HTTPS / JWT" --> API
+    DASHBOARD -- "HTTPS / JWT" --> API
+```
+
+### Flux de données — Dépôt d'une bouteille
+
+```mermaid
+sequenceDiagram
+    participant U as 👤 Utilisateur
+    participant M as 🏭 Machine ESP32
+    participant B as 🧠 Backend API
+    participant DB as 🗄️ Base de données
+
+    U->>M: Scanne QR Code
+    M->>B: POST /api/auth/verify-qr
+    B-->>M: ✅ Utilisateur identifié
+    M->>M: Affiche "Bienvenue !" sur LCD
+    
+    U->>M: Dépose bouteille(s)
+    M->>M: Détecte IR + Poids
+    M->>M: Compte les bouteilles
+    
+    M->>B: POST /api/transactions
+    Note over M,B: {user_id, bottles: 3, type: "plastic", machine_id}
+    
+    B->>DB: Créer transaction
+    B->>DB: Mettre à jour total_points (+30)
+    B-->>M: ✅ {points_earned: 30, total: 150}
+    
+    M->>M: Affiche "+30 pts ! Total: 150"
+```

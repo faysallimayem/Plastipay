@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PlastiPay QR Code - Machine ECO-TN-001</title>
+    <style>
+        body { font-family: Arial; text-align: center; background: #1a1a2e; color: white; padding: 40px; }
+        .qr { background: white; display: inline-block; padding: 20px; border-radius: 16px; margin: 20px; }
+        h1 { color: #4ade80; }
+        p { color: #aaa; }
+        .code { background: #2d2d44; padding: 10px 20px; border-radius: 8px; font-family: monospace; display: inline-block; margin: 10px; color: #4ade80; }
+    </style>
+</head>
+<body>
+    <h1>♻️ PlastiPay - QR Code Machine</h1>
+    <p>Scannez ce QR code avec l'app PlastiPay pour démarrer une session</p>
+    
+    <div class="qr">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=plastipay://connect?machine=ECO-TN-001" alt="QR Code ECO-TN-001" width="300" height="300">
+    </div>
+    
+    <br>
+    <div class="code">plastipay://connect?machine=ECO-TN-001</div>
+    
+    <p>Machine: <strong>Machine Cafétéria</strong></p>
+    <p>Serial: <strong>ECO-TN-001</strong></p>
+    
+    <hr style="border-color: #333; margin: 30px 0;">
+    
+    <h2>Machine 2</h2>
+    <div class="qr">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=plastipay://connect?machine=ECO-TN-002" alt="QR Code ECO-TN-002" width="300" height="300">
+    </div>
+    <br>
+    <div class="code">plastipay://connect?machine=ECO-TN-002</div>
+    <p>Machine: <strong>Machine Bibliothèque</strong></p>
+    <p>Serial: <strong>ECO-TN-002</strong></p>
+</body>
+</html>
