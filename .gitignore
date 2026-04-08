@@ -5,12 +5,16 @@ prisma/dev.db-journal
 dist/
 *.log
 
-# Flutter
+# Flutter (exclude build except web)
 plastipay_app/.dart_tool/
 plastipay_app/.packages
 plastipay_app/.pub/
-plastipay_app/build/
-!plastipay_app/build/web/
+plastipay_app/build/android/
+plastipay_app/build/ios/
+plastipay_app/build/windows/
+plastipay_app/build/linux/
+plastipay_app/build/macos/
+plastipay_app/build/app/
 
 # ESP32
 esp32/**/build/
