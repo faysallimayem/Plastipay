@@ -32,7 +32,14 @@ npm run db:seed
 npm run dev
 ```
 
-Le serveur démarre sur **http://localhost:3000** et sert à la fois le dashboard d'administration et l'application Flutter web.
+Le serveur démarre sur le port 3000 et sert à la fois le dashboard d'administration et l'application Flutter web.
+
+### 🌐 Accès aux Interfaces (Local)
+
+Une fois le serveur démarré, vous pouvez accéder aux interfaces via les URLs suivantes :
+
+- **Dashboard Admistrateur** : [http://localhost:3000/](http://localhost:3000/)
+- **Application Utilisateur (Flutter Web)** : [http://localhost:3000/app/](http://localhost:3000/app/)
 
 ## 🏢 Déploiement sur Render
 
