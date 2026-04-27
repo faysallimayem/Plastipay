@@ -18,9 +18,10 @@ model User {
   passwordHash String   @map("password_hash")
   firstName    String   @map("first_name")
   lastName     String   @map("last_name")
-  totalPoints  Int      @default(0) @map("total_points")
-  role         String   @default("user") // user | admin
-  createdAt    DateTime @default(now()) @map("created_at")
+  totalPoints   Int      @default(0) @map("total_points")
+  role          String   @default("user") // user | admin
+  profilePhoto  String?  @map("profile_photo")
+  createdAt     DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   transactions     Transaction[]
@@ -78,6 +79,8 @@ model RewardRedemption {
   userId      Int      @map("user_id")
   rewardId    Int      @map("reward_id")
   pointsSpent Int      @map("points_spent")
+  couponCode  String?  @map("coupon_code")
+  machineName String?  @map("machine_name")
   status      String   @default("pending") // pending | completed | cancelled
   createdAt   DateTime @default(now()) @map("created_at")
 

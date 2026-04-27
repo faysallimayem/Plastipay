@@ -12,7 +12,12 @@
     "db:studio": "npx prisma studio",
     "db:reset": "npx prisma db push --force-reset && node prisma/seed.js"
   },
-  "keywords": ["recycling", "bottles", "eco", "tunisia"],
+  "keywords": [
+    "recycling",
+    "bottles",
+    "eco",
+    "tunisia"
+  ],
   "author": "EcoCollect Team",
   "license": "MIT",
   "dependencies": {
@@ -21,7 +26,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.1.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.9",

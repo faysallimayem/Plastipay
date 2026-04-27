@@ -2,9 +2,14 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, 'uploads', 'profiles');
+fs.mkdirSync(uploadsDir, { recursive: true });
 
 // ═══════════════════════════════════════════
 // 🔧 Middleware
@@ -15,6 +20,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Servir les fichiers statiques du dashboard
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Servir les uploads (photos de profil, etc.)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Logger simple pour le développement
 app.use((req, res, next) => {

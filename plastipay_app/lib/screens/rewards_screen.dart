@@ -49,10 +49,21 @@ class _RewardsScreenState extends State<RewardsScreen> {
     try {
       final res = await _api.redeemReward(r.id);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(res['message'] ?? 'Récompense échangée ! 🎉'), backgroundColor: PlastiPayTheme.greenDark),
-        );
         _load();
+        
+        // Extract redemption data
+        final redemption = res['data']?['redemption'];
+        if (redemption != null && redemption['couponCode'] != null) {
+          _showCouponDialog(
+            couponCode: redemption['couponCode'],
+            machineName: redemption['machineName'] ?? 'PlastiPay Machine',
+            rewardName: redemption['reward'],
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(res['message'] ?? 'Récompense échangée ! 🎉'), backgroundColor: PlastiPayTheme.greenDark),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -61,6 +72,79 @@ class _RewardsScreenState extends State<RewardsScreen> {
         );
       }
     }
+  }
+
+  void _showCouponDialog({required String couponCode, required String machineName, required String rewardName}) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: PlastiPayTheme.bgCard,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: PlastiPayTheme.accentOrange.withOpacity(0.5), width: 2),
+            boxShadow: [
+              BoxShadow(color: PlastiPayTheme.accentOrange.withOpacity(0.2), blurRadius: 20, spreadRadius: 5),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.star_rounded, color: PlastiPayTheme.accentOrange, size: 64),
+              const SizedBox(height: 16),
+              const Text('Félicitations !', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white)),
+              const SizedBox(height: 8),
+              Text(rewardName, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, color: PlastiPayTheme.textPrimary)),
+              const SizedBox(height: 24),
+              
+              // Coupon Code Container
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                decoration: BoxDecoration(
+                  color: PlastiPayTheme.bgPrimary,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: PlastiPayTheme.accentOrange.withOpacity(0.3)),
+                ),
+                child: Column(
+                  children: [
+                    const Text('VOTRE CODE', style: TextStyle(fontSize: 12, color: PlastiPayTheme.textMuted, letterSpacing: 2)),
+                    const SizedBox(height: 8),
+                    SelectableText(
+                      couponCode,
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: PlastiPayTheme.accentOrange, letterSpacing: 1.5),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 20),
+              const Text('Présentez ce code au barista chez :', style: TextStyle(fontSize: 13, color: PlastiPayTheme.textMuted)),
+              const SizedBox(height: 4),
+              Text(
+                machineName,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: PlastiPayTheme.greenLight),
+              ),
+              const SizedBox(height: 28),
+              
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: PlastiPayTheme.accentOrange,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Compris !'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override

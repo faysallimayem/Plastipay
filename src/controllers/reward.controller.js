@@ -81,6 +81,23 @@ const redeemReward = async (req, res) => {
             });
         }
 
+        // Trouver la machine du dernier dépôt de l'utilisateur
+        const lastTransaction = await prisma.transaction.findFirst({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            include: { machine: { select: { name: true } } },
+        });
+
+        const machineName = lastTransaction?.machine?.name || 'PlastiPay';
+
+        // Générer un code coupon unique: PP-MACHINESHORT-XXXX
+        const machineShort = machineName
+            .replace(/[^a-zA-Z0-9]/g, '')
+            .substring(0, 8)
+            .toUpperCase();
+        const randomHex = require('crypto').randomBytes(2).toString('hex').toUpperCase();
+        const couponCode = `PP-${machineShort}-${randomHex}`;
+
         // Créer l'échange et déduire les points
         const [redemption, updatedUser] = await prisma.$transaction([
             prisma.rewardRedemption.create({
@@ -88,6 +105,8 @@ const redeemReward = async (req, res) => {
                     userId,
                     rewardId,
                     pointsSpent: reward.pointsCost,
+                    couponCode,
+                    machineName,
                     status: 'pending',
                 },
             }),
@@ -105,6 +124,8 @@ const redeemReward = async (req, res) => {
                     id: redemption.id,
                     reward: reward.name,
                     pointsSpent: redemption.pointsSpent,
+                    couponCode: redemption.couponCode,
+                    machineName: redemption.machineName,
                     status: redemption.status,
                 },
                 remainingPoints: updatedUser.totalPoints,

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, getProfile } = require('../controllers/auth.controller');
+const { register, login, getProfile, uploadProfilePhoto, upload } = require('../controllers/auth.controller');
 const { authMiddleware } = require('../middleware/auth');
 const { validateRequired, validateEmail, validatePassword } = require('../middleware/validate');
 
@@ -22,5 +22,8 @@ router.post(
 
 // GET /api/auth/profile - Profil (protégé)
 router.get('/profile', authMiddleware, getProfile);
+
+// POST /api/auth/profile/photo - Upload profile photo (protégé)
+router.post('/profile/photo', authMiddleware, upload.single('photo'), uploadProfilePhoto);
 
 module.exports = router;

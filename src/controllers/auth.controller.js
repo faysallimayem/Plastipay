@@ -1,6 +1,30 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const prisma = require('../config/database');
+const path = require('path');
+const multer = require('multer');
+
+// Configure multer for profile photo uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '..', 'uploads', 'profiles'));
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        cb(null, `user_${req.user.id}_${Date.now()}${ext}`);
+    },
+});
+
+const upload = multer({
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+    fileFilter: (req, file, cb) => {
+        const allowed = ['.jpg', '.jpeg', '.png', '.webp'];
+        const ext = path.extname(file.originalname).toLowerCase();
+        if (allowed.includes(ext)) cb(null, true);
+        else cb(new Error('Format non supporté. Utilisez JPG, PNG ou WebP.'));
+    },
+});
 
 /**
  * Inscription d'un nouvel utilisateur
@@ -51,6 +75,7 @@ const register = async (req, res) => {
                     lastName: user.lastName,
                     totalPoints: user.totalPoints,
                     role: user.role,
+                    profilePhoto: user.profilePhoto || null,
                 },
                 token,
             },
@@ -108,6 +133,7 @@ const login = async (req, res) => {
                     lastName: user.lastName,
                     totalPoints: user.totalPoints,
                     role: user.role,
+                    profilePhoto: user.profilePhoto || null,
                 },
                 token,
             },
@@ -137,6 +163,7 @@ const getProfile = async (req, res) => {
                 lastName: true,
                 totalPoints: true,
                 role: true,
+                profilePhoto: true,
                 createdAt: true,
                 _count: {
                     select: {
@@ -171,4 +198,38 @@ const getProfile = async (req, res) => {
     }
 };
 
-module.exports = { register, login, getProfile };
+/**
+ * Upload profile photo
+ * POST /api/auth/profile/photo
+ */
+const uploadProfilePhoto = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'Aucune image envoyée.',
+            });
+        }
+
+        const photoUrl = `/uploads/profiles/${req.file.filename}`;
+
+        await prisma.user.update({
+            where: { id: req.user.id },
+            data: { profilePhoto: photoUrl },
+        });
+
+        res.json({
+            success: true,
+            message: 'Photo de profil mise à jour ! 📸',
+            data: { profilePhoto: photoUrl },
+        });
+    } catch (error) {
+        console.error('Erreur upload photo:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de l\'upload.',
+        });
+    }
+};
+
+module.exports = { register, login, getProfile, uploadProfilePhoto, upload };

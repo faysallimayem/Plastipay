@@ -7,6 +7,7 @@ class User {
   final String role;
   final int totalPoints;
   final String? createdAt;
+  final String? profilePhoto;
 
   User({
     required this.id,
@@ -17,6 +18,7 @@ class User {
     required this.role,
     required this.totalPoints,
     this.createdAt,
+    this.profilePhoto,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class User {
       role: json['role'] ?? 'user',
       totalPoints: json['totalPoints'] ?? 0,
       createdAt: json['createdAt'],
+      profilePhoto: json['profilePhoto'],
     );
   }
 

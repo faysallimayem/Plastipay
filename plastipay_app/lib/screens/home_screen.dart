@@ -104,7 +104,12 @@ class _HomePageState extends State<_HomePage> {
                   CircleAvatar(
                     radius: 24,
                     backgroundColor: PlastiPayTheme.greenDark,
-                    child: Text(user?.initials ?? 'U', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                    backgroundImage: (user?.profilePhoto != null && user!.profilePhoto!.isNotEmpty)
+                        ? NetworkImage(_api.getPhotoUrl(user.profilePhoto!))
+                        : null,
+                    child: (user?.profilePhoto == null || user!.profilePhoto!.isEmpty)
+                        ? Text(user?.initials ?? 'U', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700))
+                        : null,
                   ),
                   const SizedBox(width: 14),
                   Expanded(

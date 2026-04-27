@@ -166,4 +166,49 @@ class ApiService {
     if (data['success'] != true) throw Exception(data['message'] ?? 'Erreur');
     return data['data']['summary'];
   }
+
+  // ═══════════════════════════════════════════
+  // PROFILE PHOTO
+  // ═══════════════════════════════════════════
+  Future<String> uploadProfilePhoto(List<int> imageBytes, String filename) async {
+    final uri = Uri.parse('$baseUrl/auth/profile/photo');
+    final request = http.MultipartRequest('POST', uri);
+    request.headers['Authorization'] = 'Bearer $_token';
+    request.files.add(http.MultipartFile.fromBytes(
+      'photo',
+      imageBytes,
+      filename: filename,
+    ));
+    final streamedRes = await request.send();
+    final resBody = await streamedRes.stream.bytesToString();
+    final data = jsonDecode(resBody);
+    if (data['success'] != true) throw Exception(data['message'] ?? 'Erreur upload');
+
+    final photoUrl = data['data']['profilePhoto'] as String;
+
+    // Refresh user with new photo
+    if (_currentUser != null) {
+      _currentUser = User(
+        id: _currentUser!.id,
+        email: _currentUser!.email,
+        phone: _currentUser!.phone,
+        firstName: _currentUser!.firstName,
+        lastName: _currentUser!.lastName,
+        role: _currentUser!.role,
+        totalPoints: _currentUser!.totalPoints,
+        createdAt: _currentUser!.createdAt,
+        profilePhoto: photoUrl,
+      );
+    }
+
+    return photoUrl;
+  }
+
+  /// Build full URL for a profile photo path
+  String getPhotoUrl(String photoPath) {
+    if (photoPath.startsWith('http')) return photoPath;
+    // Remove /api from baseUrl and append the photo path
+    final baseOrigin = baseUrl.replaceAll('/api', '');
+    return '$baseOrigin$photoPath';
+  }
 }

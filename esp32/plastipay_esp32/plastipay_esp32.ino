@@ -26,6 +26,7 @@
  */
 
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
@@ -39,9 +40,8 @@
 const char* WIFI_SSID     = "Ooredoo-ALHN-8436-5";       // ← Votre nom WiFi
 const char* WIFI_PASSWORD = "9sU54xkcQq";    // ← Votre mot de passe WiFi
 
-// Serveur Backend (l'IP de votre PC sur le réseau local)
-// Pour trouver votre IP: ouvrez cmd et tapez "ipconfig"
-const char* SERVER_URL    = "http://192.168.1.9:3000";  // ← Changer avec votre IP
+// Serveur Backend (Render cloud)
+const char* SERVER_URL    = "https://plastipay.onrender.com";
 const char* MACHINE_API_KEY = "machine_key_001_secret";   // ← Clé API de la machine
 
 // Hardware Pins (ESP32-S3)
@@ -55,7 +55,7 @@ const char* MACHINE_API_KEY = "machine_key_001_secret";   // ← Clé API de la 
 #define LCD_ROWS        2
 
 // Timing (en millisecondes)
-#define POLL_INTERVAL       3000   // Vérifier session toutes les 3 secondes
+#define POLL_INTERVAL       5000   // Vérifier session toutes les 5 secondes
 #define DEBOUNCE_TIME       3000   // Anti-rebond capteur IR (3 sec entre 2 bouteilles)
 #define WIFI_RETRY_DELAY    500    // Délai entre tentatives WiFi
 #define LCD_MESSAGE_DISPLAY 2000   // Durée affichage message temporaire
@@ -185,12 +185,14 @@ void pollSession() {
     return;
   }
   
+  WiFiClientSecure client;
+  client.setInsecure();  // Skip SSL certificate verification
   HTTPClient http;
   String url = String(SERVER_URL) + "/api/machines/session/active";
   
-  http.begin(url);
+  http.begin(client, url);
   http.addHeader("x-machine-api-key", MACHINE_API_KEY);
-  http.setTimeout(5000);
+  http.setTimeout(30000);
   
   int httpCode = http.GET();
   
@@ -287,13 +289,15 @@ void handleBottleDetection() {
 void sendTransaction() {
   if (WiFi.status() != WL_CONNECTED) return;
   
+  WiFiClientSecure client;
+  client.setInsecure();  // Skip SSL certificate verification
   HTTPClient http;
   String url = String(SERVER_URL) + "/api/transactions";
   
-  http.begin(url);
+  http.begin(client, url);
   http.addHeader("Content-Type", "application/json");
   http.addHeader("x-machine-api-key", MACHINE_API_KEY);
-  http.setTimeout(5000);
+  http.setTimeout(30000);
   
   // Build JSON body
   JsonDocument doc;
