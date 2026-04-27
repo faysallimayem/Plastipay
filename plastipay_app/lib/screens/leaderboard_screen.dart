@@ -92,12 +92,17 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
           CircleAvatar(
             radius: 20,
             backgroundColor: isTop3 ? rankColor.withOpacity(0.2) : PlastiPayTheme.bluePrimary.withOpacity(0.2),
-            backgroundImage: (e.profilePhoto != null && e.profilePhoto!.isNotEmpty)
-                ? NetworkImage(_api.getPhotoUrl(e.profilePhoto!))
-                : null,
-            child: (e.profilePhoto == null || e.profilePhoto!.isEmpty)
-                ? Text(e.initials, style: TextStyle(color: isTop3 ? rankColor : PlastiPayTheme.bluePrimary, fontWeight: FontWeight.w700, fontSize: 13))
-                : null,
+            child: (e.profilePhoto != null && e.profilePhoto!.isNotEmpty)
+                ? ClipOval(
+                    child: Image.network(
+                      _api.getPhotoUrl(e.profilePhoto!),
+                      width: 40,
+                      height: 40,
+                      fit: BoxFit.cover,
+                      errorBuilder: (ctx, err, stack) => Text(e.initials, style: TextStyle(color: isTop3 ? rankColor : PlastiPayTheme.bluePrimary, fontWeight: FontWeight.w700, fontSize: 13)),
+                    ),
+                  )
+                : Text(e.initials, style: TextStyle(color: isTop3 ? rankColor : PlastiPayTheme.bluePrimary, fontWeight: FontWeight.w700, fontSize: 13)),
           ),
           const SizedBox(width: 12),
           // Name

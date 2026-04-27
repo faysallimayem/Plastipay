@@ -78,15 +78,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
         CircleAvatar(
           radius: 52,
           backgroundColor: PlastiPayTheme.greenDark,
-          backgroundImage: (photoUrl != null && photoUrl.isNotEmpty)
-              ? NetworkImage(_api.getPhotoUrl(photoUrl))
-              : null,
-          child: (photoUrl == null || photoUrl.isEmpty)
-              ? Text(
+          child: (photoUrl != null && photoUrl.isNotEmpty)
+              ? ClipOval(
+                  child: Image.network(
+                    _api.getPhotoUrl(photoUrl),
+                    width: 104,
+                    height: 104,
+                    fit: BoxFit.cover,
+                    errorBuilder: (ctx, err, stack) => Text(
+                      user?.initials ?? 'U',
+                      style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w800, color: Colors.white),
+                    ),
+                  ),
+                )
+              : Text(
                   user?.initials ?? 'U',
                   style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w800, color: Colors.white),
-                )
-              : null,
+                ),
         ),
         Positioned(
           bottom: 0,
