@@ -72,7 +72,7 @@ class ApiService {
     final res = await http.get(Uri.parse('$baseUrl/auth/profile'), headers: _headers);
     final data = jsonDecode(res.body);
     if (data['success'] != true) throw Exception('Session expirée');
-    _currentUser = User.fromJson(data['data']['user']);
+    _currentUser = User.fromJson(data['data']);
     return _currentUser!;
   }
 

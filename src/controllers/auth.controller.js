@@ -71,6 +71,7 @@ const register = async (req, res) => {
                 user: {
                     id: user.id,
                     email: user.email,
+                    phone: user.phone || null,
                     firstName: user.firstName,
                     lastName: user.lastName,
                     totalPoints: user.totalPoints,
@@ -129,6 +130,7 @@ const login = async (req, res) => {
                 user: {
                     id: user.id,
                     email: user.email,
+                    phone: user.phone || null,
                     firstName: user.firstName,
                     lastName: user.lastName,
                     totalPoints: user.totalPoints,

@@ -15,6 +15,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _api = ApiService();
   bool _uploading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    try {
+      await _api.getProfile();
+      if (mounted) setState(() {});
+    } catch (_) {}
+  }
+
   Future<void> _pickAndUploadPhoto() async {
     try {
       final picker = ImagePicker();
