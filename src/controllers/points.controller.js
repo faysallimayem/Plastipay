@@ -71,6 +71,7 @@ const getLeaderboard = async (req, res) => {
                 firstName: true,
                 lastName: true,
                 totalPoints: true,
+                profilePhoto: true,
                 _count: {
                     select: { transactions: true },
                 },
@@ -84,6 +85,7 @@ const getLeaderboard = async (req, res) => {
             name: `${user.firstName} ${user.lastName}`,
             totalPoints: user.totalPoints,
             totalDeposits: user._count.transactions,
+            profilePhoto: user.profilePhoto,
         }));
 
         res.json({

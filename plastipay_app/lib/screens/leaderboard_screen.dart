@@ -92,7 +92,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
           CircleAvatar(
             radius: 20,
             backgroundColor: isTop3 ? rankColor.withOpacity(0.2) : PlastiPayTheme.bluePrimary.withOpacity(0.2),
-            child: Text(e.initials, style: TextStyle(color: isTop3 ? rankColor : PlastiPayTheme.bluePrimary, fontWeight: FontWeight.w700, fontSize: 13)),
+            backgroundImage: (e.profilePhoto != null && e.profilePhoto!.isNotEmpty)
+                ? NetworkImage(_api.getPhotoUrl(e.profilePhoto!))
+                : null,
+            child: (e.profilePhoto == null || e.profilePhoto!.isEmpty)
+                ? Text(e.initials, style: TextStyle(color: isTop3 ? rankColor : PlastiPayTheme.bluePrimary, fontWeight: FontWeight.w700, fontSize: 13))
+                : null,
           ),
           const SizedBox(width: 12),
           // Name
@@ -100,7 +105,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(e.fullName, style: const TextStyle(fontWeight: FontWeight.w600, color: PlastiPayTheme.textPrimary, fontSize: 14)),
+                Text(e.name, style: const TextStyle(fontWeight: FontWeight.w600, color: PlastiPayTheme.textPrimary, fontSize: 14)),
                 Text('${e.totalDeposits} dépôts', style: const TextStyle(color: PlastiPayTheme.textMuted, fontSize: 12)),
               ],
             ),

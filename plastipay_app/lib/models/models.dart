@@ -99,29 +99,35 @@ class Reward {
 
 class LeaderboardEntry {
   final int rank;
-  final String firstName;
-  final String lastName;
+  final String name;
   final int totalPoints;
   final int totalDeposits;
+  final String? profilePhoto;
 
   LeaderboardEntry({
     required this.rank,
-    required this.firstName,
-    required this.lastName,
+    required this.name,
     required this.totalPoints,
     required this.totalDeposits,
+    this.profilePhoto,
   });
 
   factory LeaderboardEntry.fromJson(Map<String, dynamic> json, int rank) {
     return LeaderboardEntry(
       rank: rank,
-      firstName: json['firstName'] ?? '',
-      lastName: json['lastName'] ?? '',
+      name: json['name'] ?? 'Utilisateur',
       totalPoints: json['totalPoints'] ?? 0,
       totalDeposits: json['totalDeposits'] ?? 0,
+      profilePhoto: json['profilePhoto'],
     );
   }
 
-  String get fullName => '$firstName $lastName';
-  String get initials => '${firstName.isNotEmpty ? firstName[0] : ''}${lastName.isNotEmpty ? lastName[0] : ''}'.toUpperCase();
+  String get initials {
+    if (name.isEmpty) return 'U';
+    final parts = name.split(' ');
+    if (parts.length > 1 && parts[1].isNotEmpty) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return name[0].toUpperCase();
+  }
 }
