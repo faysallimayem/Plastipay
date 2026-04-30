@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../services/api_service.dart';
 import 'home_screen.dart';
+import 'scan_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  /// If set, after login the user is redirected directly to the machine session
+  final String? machineSerial;
+
+  const LoginScreen({super.key, this.machineSerial});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -36,13 +40,28 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  /// Navigate after successful auth: either to machine session or home
+  void _navigateAfterAuth() {
+    if (!mounted) return;
+    if (widget.machineSerial != null && widget.machineSerial!.isNotEmpty) {
+      // QR code flow: go directly to the machine session
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ScanScreen(autoConnectSerial: widget.machineSerial),
+        ),
+      );
+    } else {
+      // Normal flow: go to home
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+    }
+  }
+
   Future<void> _handleLogin() async {
     setState(() { _isLoading = true; _error = ''; });
     try {
       await ApiService().login(_emailController.text.trim(), _passwordController.text);
-      if (mounted) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
-      }
+      _navigateAfterAuth();
     } catch (e) {
       setState(() => _error = e.toString().replaceAll('Exception: ', ''));
     } finally {
@@ -60,9 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _phoneController.text.trim(),
         _regPasswordController.text,
       );
-      if (mounted) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
-      }
+      _navigateAfterAuth();
     } catch (e) {
       setState(() => _error = e.toString().replaceAll('Exception: ', ''));
     } finally {
@@ -110,6 +127,36 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text('Plastic Pays, Planet Wins', style: TextStyle(color: PlastiPayTheme.textSecondary, fontSize: 14)),
+
+                  // Show machine badge when coming from QR scan
+                  if (widget.machineSerial != null) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: PlastiPayTheme.greenPrimary.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: PlastiPayTheme.greenPrimary.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.qr_code_rounded, color: PlastiPayTheme.greenPrimary, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Machine ${widget.machineSerial}',
+                            style: const TextStyle(color: PlastiPayTheme.greenPrimary, fontWeight: FontWeight.w600, fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Connectez-vous pour démarrer la session',
+                      style: TextStyle(color: PlastiPayTheme.textMuted, fontSize: 12),
+                    ),
+                  ],
+
                   const SizedBox(height: 40),
 
                   // Toggle Login/Register

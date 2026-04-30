@@ -6,16 +6,22 @@ const jwt = require('jsonwebtoken');
  */
 const authMiddleware = (req, res, next) => {
     try {
-        // Récupérer le token du header
+        // Récupérer le token du header ou du query param (pour les pages ouvertes dans un nouvel onglet)
         const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        let token = null;
+
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.split(' ')[1];
+        } else if (req.query.token) {
+            token = req.query.token;
+        }
+
+        if (!token) {
             return res.status(401).json({
                 success: false,
                 message: 'Accès refusé. Token manquant.',
             });
         }
-
-        const token = authHeader.split(' ')[1];
 
         // Vérifier le token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);

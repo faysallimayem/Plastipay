@@ -349,4 +349,231 @@ const getMySession = async (req, res) => {
     }
 };
 
-module.exports = { createMachine, getMachines, updateMachineStatus, startSession, getActiveSession, endSession, getMySession };
+/**
+ * Get QR code data for a machine
+ * GET /api/machines/:id/qr
+ * Auth: Admin
+ */
+const getQRCode = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const machine = await prisma.machine.findUnique({
+            where: { id: parseInt(id) },
+            select: { id: true, name: true, location: true, serialNumber: true, status: true },
+        });
+
+        if (!machine) {
+            return res.status(404).json({ success: false, message: 'Machine non trouvée.' });
+        }
+
+        // Build the app URL — use request origin or env var
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+        const host = req.headers['x-forwarded-host'] || req.headers.host;
+        const baseUrl = process.env.APP_BASE_URL || `${protocol}://${host}`;
+        const qrUrl = `${baseUrl}/app?machine=${machine.serialNumber}`;
+        const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrUrl)}&bgcolor=ffffff&color=000000&margin=10`;
+
+        res.json({
+            success: true,
+            data: {
+                machine: {
+                    id: machine.id,
+                    name: machine.name,
+                    location: machine.location,
+                    serialNumber: machine.serialNumber,
+                },
+                qr: {
+                    url: qrUrl,
+                    imageUrl: qrImageUrl,
+                },
+            },
+        });
+    } catch (error) {
+        console.error('Erreur QR code:', error);
+        res.status(500).json({ success: false, message: 'Erreur serveur.' });
+    }
+};
+
+/**
+ * Get a printable QR code sticker page for a machine
+ * GET /api/machines/:id/qr/print
+ * Auth: Admin
+ */
+const getQRCodePrintPage = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const machine = await prisma.machine.findUnique({
+            where: { id: parseInt(id) },
+            select: { id: true, name: true, location: true, serialNumber: true },
+        });
+
+        if (!machine) {
+            return res.status(404).json({ success: false, message: 'Machine non trouvée.' });
+        }
+
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+        const host = req.headers['x-forwarded-host'] || req.headers.host;
+        const baseUrl = process.env.APP_BASE_URL || `${protocol}://${host}`;
+        const qrUrl = `${baseUrl}/app?machine=${machine.serialNumber}`;
+        const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrUrl)}&bgcolor=ffffff&color=000000&margin=10`;
+
+        const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code — ${machine.name}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .sticker {
+            width: 360px;
+            background: white;
+            border-radius: 28px;
+            padding: 36px 32px 28px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .sticker::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #16A34A, #22C55E, #4ADE80);
+        }
+        .brand {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 2px;
+        }
+        .brand span { color: #22C55E; }
+        .tagline {
+            font-size: 11px;
+            color: #94A3B8;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .qr-container {
+            background: white;
+            border: 3px solid #E2E8F0;
+            border-radius: 20px;
+            padding: 16px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .qr-container img {
+            display: block;
+            width: 220px;
+            height: 220px;
+        }
+        .scan-label {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        .scan-sub {
+            font-size: 12px;
+            color: #64748B;
+            margin-bottom: 20px;
+        }
+        .machine-info {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-bottom: 14px;
+        }
+        .machine-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .machine-location {
+            font-size: 12px;
+            color: #64748B;
+            margin-top: 2px;
+        }
+        .serial {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            color: #22C55E;
+            background: #F0FDF4;
+            border: 1px solid #BBF7D0;
+            border-radius: 8px;
+            padding: 6px 14px;
+            display: inline-block;
+        }
+        .footer {
+            margin-top: 16px;
+            font-size: 10px;
+            color: #94A3B8;
+        }
+        @media print {
+            body { background: white; padding: 0; }
+            .sticker { box-shadow: none; border: 2px solid #E2E8F0; }
+            .no-print { display: none; }
+        }
+        .btn-print {
+            margin-top: 24px;
+            padding: 12px 32px;
+            background: #22C55E;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-print:hover { background: #16A34A; }
+    </style>
+</head>
+<body>
+    <div>
+        <div class="sticker">
+            <div class="brand">♻️ Plasti<span>Pay</span></div>
+            <div class="tagline">Plastic Pays, Planet Wins</div>
+            <div class="qr-container">
+                <img src="${qrImageUrl}" alt="QR Code ${machine.serialNumber}">
+            </div>
+            <div class="scan-label">📱 Scannez pour recycler</div>
+            <div class="scan-sub">Ouvrez votre caméra et scannez ce QR code</div>
+            <div class="machine-info">
+                <div class="machine-name">🏭 ${machine.name}</div>
+                <div class="machine-location">📍 ${machine.location}</div>
+            </div>
+            <div class="serial">${machine.serialNumber}</div>
+            <div class="footer">plastipay.tn — Système de recyclage intelligent</div>
+        </div>
+        <div class="no-print" style="text-align:center">
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimer le sticker</button>
+        </div>
+    </div>
+</body>
+</html>`;
+
+        res.setHeader('Content-Type', 'text/html');
+        res.send(html);
+    } catch (error) {
+        console.error('Erreur QR print page:', error);
+        res.status(500).json({ success: false, message: 'Erreur serveur.' });
+    }
+};
+
+module.exports = { createMachine, getMachines, updateMachineStatus, startSession, getActiveSession, endSession, getMySession, getQRCode, getQRCodePrintPage };

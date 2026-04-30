@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createMachine, getMachines, updateMachineStatus, startSession, getActiveSession, endSession, getMySession } = require('../controllers/machine.controller');
+const { createMachine, getMachines, updateMachineStatus, startSession, getActiveSession, endSession, getMySession, getQRCode, getQRCodePrintPage } = require('../controllers/machine.controller');
 const { authMiddleware, adminOnly, machineAuth } = require('../middleware/auth');
 const { validateRequired } = require('../middleware/validate');
 
@@ -24,6 +24,16 @@ router.patch(
     validateRequired(['status']),
     updateMachineStatus
 );
+
+// ═══════════════════════════════════════════
+// 📱 QR CODE ROUTES
+// ═══════════════════════════════════════════
+
+// GET /api/machines/:id/qr - Get QR code data (admin)
+router.get('/:id/qr', authMiddleware, adminOnly, getQRCode);
+
+// GET /api/machines/:id/qr/print - Printable QR sticker page (admin)
+router.get('/:id/qr/print', authMiddleware, adminOnly, getQRCodePrintPage);
 
 // ═══════════════════════════════════════════
 // 🔗 SESSION ROUTES (QR Code → Machine link)

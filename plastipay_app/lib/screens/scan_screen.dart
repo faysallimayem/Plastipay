@@ -5,7 +5,10 @@ import '../config/theme.dart';
 import '../services/api_service.dart';
 
 class ScanScreen extends StatefulWidget {
-  const ScanScreen({super.key});
+  /// If provided, the screen will auto-connect to this machine on init
+  final String? autoConnectSerial;
+
+  const ScanScreen({super.key, this.autoConnectSerial});
 
   @override
   State<ScanScreen> createState() => _ScanScreenState();
@@ -25,6 +28,16 @@ class _ScanScreenState extends State<ScanScreen> {
   int _pointsThisSession = 0;
   
   Timer? _pollTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Auto-connect if serial was provided (QR code flow)
+    if (widget.autoConnectSerial != null && widget.autoConnectSerial!.isNotEmpty) {
+      // Use a short delay to let the widget tree build
+      Future.microtask(() => _connectToMachine(widget.autoConnectSerial!));
+    }
+  }
 
   @override
   void dispose() {

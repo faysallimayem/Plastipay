@@ -326,6 +326,7 @@ const App = {
                         <td>${m.lastPing ? this.formatDate(m.lastPing) : '—'}</td>
                         <td><div class="action-btns">
                             <button class="btn-icon edit" onclick='App.showMachineModal(${JSON.stringify({id:m.id,name:m.name,location:m.location,serialNumber:m.serialNumber,status:m.status})})' title="Modifier">✏️</button>
+                            <button class="btn-icon" onclick="App.showQRModal(${m.id}, \`${m.serialNumber}\`, \`${m.name}\`, \`${m.location}\`)" title="QR Code" style="background:rgba(34,197,94,0.1)">📱</button>
                             <button class="btn-icon delete" onclick="App.deleteMachine(${m.id}, \`${m.name}\`)" title="Supprimer">🗑️</button>
                         </div></td>
                     </tr>`).join('')}</tbody>
@@ -382,6 +383,31 @@ const App = {
             if (res?.success) { this.toast(res.message); this.renderMachines(); }
             else this.toast(res?.message || 'Erreur', 'error');
         } catch (err) { this.toast('Erreur réseau', 'error'); }
+    },
+
+    showQRModal(machineId, serialNumber, name, location) {
+        const baseUrl = window.location.origin;
+        const qrUrl = `${baseUrl}/app?machine=${serialNumber}`;
+        const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrUrl)}&bgcolor=ffffff&color=000000&margin=10`;
+
+        const html = `
+            <div style="text-align:center">
+                <h2 style="margin-bottom:4px">📱 QR Code Machine</h2>
+                <p style="color:var(--text-muted);font-size:13px;margin-bottom:20px">${name} — ${location}</p>
+                <div style="background:white;display:inline-block;padding:16px;border-radius:16px;margin-bottom:16px">
+                    <img src="${qrImageUrl}" width="240" height="240" alt="QR Code ${serialNumber}" style="display:block">
+                </div>
+                <div style="margin-bottom:16px">
+                    <span style="font-family:monospace;font-size:13px;background:var(--bg-primary);padding:8px 16px;border-radius:8px;color:var(--green-primary);display:inline-block;word-break:break-all;max-width:100%">${qrUrl}</span>
+                </div>
+                <p style="color:var(--text-muted);font-size:12px;margin-bottom:20px">Scannez ce QR code pour accéder directement à la machine</p>
+                <div class="modal-actions" style="flex-wrap:wrap;gap:8px">
+                    <button type="button" class="btn-secondary" onclick="App.closeModal()">Fermer</button>
+                    <button type="button" class="btn-primary" onclick="navigator.clipboard.writeText('${qrUrl}').then(()=>App.toast('Lien copié! 📋'))">📋 Copier le lien</button>
+                    <button type="button" class="btn-primary" onclick="window.open('/api/machines/${machineId}/qr/print?token=' + Auth.token, '_blank')" style="background:var(--accent-orange)">🖨️ Imprimer sticker</button>
+                </div>
+            </div>`;
+        this.showModal(html);
     },
 
     // ═══════════════════════════════════════════

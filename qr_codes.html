@@ -1,38 +1,289 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>PlastiPay QR Code - Machine ECO-TN-001</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlastiPay — QR Codes Machines</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial; text-align: center; background: #1a1a2e; color: white; padding: 40px; }
-        .qr { background: white; display: inline-block; padding: 20px; border-radius: 16px; margin: 20px; }
-        h1 { color: #4ade80; }
-        p { color: #aaa; }
-        .code { background: #2d2d44; padding: 10px 20px; border-radius: 8px; font-family: monospace; display: inline-block; margin: 10px; color: #4ade80; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0A0F1A;
+            color: #F1F5F9;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .header .logo {
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+        .header .logo span { color: #22C55E; }
+        .header .tagline {
+            font-size: 13px;
+            color: #64748B;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .header .subtitle {
+            margin-top: 16px;
+            font-size: 15px;
+            color: #94A3B8;
+        }
+        .header .subtitle strong { color: #22C55E; }
+        .url-config {
+            max-width: 500px;
+            margin: 20px auto 0;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .url-config label {
+            font-size: 12px;
+            color: #64748B;
+            white-space: nowrap;
+        }
+        .url-config input {
+            flex: 1;
+            background: #1A2332;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #F1F5F9;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+        }
+        .url-config input:focus {
+            outline: none;
+            border-color: #22C55E;
+        }
+        .url-config button {
+            background: #22C55E;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 18px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .url-config button:hover { background: #16A34A; }
+
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 32px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .sticker {
+            width: 340px;
+            background: #1A2332;
+            border-radius: 24px;
+            padding: 32px 28px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .sticker:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(34,197,94,0.15);
+        }
+        .sticker::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #16A34A, #22C55E, #4ADE80);
+        }
+        .sticker .brand {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+        .sticker .brand span { color: #22C55E; }
+        .sticker .tagline-sm {
+            font-size: 10px;
+            color: #64748B;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+        .qr-container {
+            background: white;
+            border-radius: 18px;
+            padding: 14px;
+            display: inline-block;
+            margin-bottom: 18px;
+        }
+        .qr-container img {
+            display: block;
+            width: 200px;
+            height: 200px;
+        }
+        .scan-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #F1F5F9;
+            margin-bottom: 3px;
+        }
+        .scan-sub {
+            font-size: 11px;
+            color: #64748B;
+            margin-bottom: 16px;
+        }
+        .machine-info {
+            background: rgba(34,197,94,0.08);
+            border: 1px solid rgba(34,197,94,0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+        }
+        .machine-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #F1F5F9;
+        }
+        .machine-location {
+            font-size: 11px;
+            color: #64748B;
+            margin-top: 2px;
+        }
+        .serial {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: #22C55E;
+            background: rgba(34,197,94,0.1);
+            border: 1px solid rgba(34,197,94,0.2);
+            border-radius: 8px;
+            padding: 5px 12px;
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+        .qr-url {
+            font-size: 10px;
+            color: #64748B;
+            word-break: break-all;
+            margin-top: 6px;
+        }
+
+        .print-bar {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .print-bar button {
+            padding: 14px 36px;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 0 6px;
+        }
+        .btn-print {
+            background: #22C55E;
+            color: white;
+        }
+        .btn-print:hover { background: #16A34A; }
+
+        @media print {
+            body { background: white; color: #1a1a2e; padding: 10px; }
+            .no-print { display: none !important; }
+            .sticker {
+                background: white;
+                border: 2px solid #E2E8F0;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            .sticker:hover { transform: none; box-shadow: none; }
+            .machine-info { background: #F8FAFC; border-color: #E2E8F0; }
+            .machine-name { color: #1a1a2e; }
+            .brand { color: #1a1a2e; }
+            .scan-label { color: #1a1a2e; }
+        }
     </style>
 </head>
 <body>
-    <h1>♻️ PlastiPay - QR Code Machine</h1>
-    <p>Scannez ce QR code avec l'app PlastiPay pour démarrer une session</p>
-    
-    <div class="qr">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=plastipay://connect?machine=ECO-TN-001" alt="QR Code ECO-TN-001" width="300" height="300">
+    <div class="header">
+        <div class="logo">♻️ Plasti<span>Pay</span></div>
+        <div class="tagline">Plastic Pays, Planet Wins</div>
+        <p class="subtitle">QR Codes pour <strong>toutes les machines</strong> — prêts à imprimer et coller</p>
+        <div class="url-config no-print">
+            <label>Base URL:</label>
+            <input type="text" id="base-url" placeholder="https://yoursite.onrender.com">
+            <button onclick="regenerate()">🔄 Générer</button>
+        </div>
     </div>
-    
-    <br>
-    <div class="code">plastipay://connect?machine=ECO-TN-001</div>
-    
-    <p>Machine: <strong>Machine Cafétéria</strong></p>
-    <p>Serial: <strong>ECO-TN-001</strong></p>
-    
-    <hr style="border-color: #333; margin: 30px 0;">
-    
-    <h2>Machine 2</h2>
-    <div class="qr">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=plastipay://connect?machine=ECO-TN-002" alt="QR Code ECO-TN-002" width="300" height="300">
+
+    <div class="cards" id="cards-container"></div>
+
+    <div class="print-bar no-print">
+        <button class="btn-print" onclick="window.print()">🖨️ Imprimer tous les QR codes</button>
     </div>
-    <br>
-    <div class="code">plastipay://connect?machine=ECO-TN-002</div>
-    <p>Machine: <strong>Machine Bibliothèque</strong></p>
-    <p>Serial: <strong>ECO-TN-002</strong></p>
+
+    <script>
+        // Machine data — update this when you add new machines
+        const machines = [
+            { serial: 'ECO-TN-001', name: 'Machine Cafétéria', location: 'Cafétéria principale - RDC' },
+            { serial: 'ECO-TN-002', name: 'Machine Bibliothèque', location: 'Bibliothèque - 1er étage' },
+        ];
+
+        function getBaseUrl() {
+            const input = document.getElementById('base-url');
+            return input.value.replace(/\/$/, '') || window.location.origin;
+        }
+
+        function generateCard(machine, baseUrl) {
+            const qrUrl = `${baseUrl}/app?machine=${machine.serial}`;
+            const qrImg = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrUrl)}&bgcolor=ffffff&color=000000&margin=10`;
+            return `
+                <div class="sticker">
+                    <div class="brand">♻️ Plasti<span>Pay</span></div>
+                    <div class="tagline-sm">Plastic Pays, Planet Wins</div>
+                    <div class="qr-container">
+                        <img src="${qrImg}" alt="QR Code ${machine.serial}" loading="lazy">
+                    </div>
+                    <div class="scan-label">📱 Scannez pour recycler</div>
+                    <div class="scan-sub">Ouvrez votre caméra et scannez ce QR code</div>
+                    <div class="machine-info">
+                        <div class="machine-name">🏭 ${machine.name}</div>
+                        <div class="machine-location">📍 ${machine.location}</div>
+                    </div>
+                    <div class="serial">${machine.serial}</div>
+                    <div class="qr-url">${qrUrl}</div>
+                </div>`;
+        }
+
+        function regenerate() {
+            const baseUrl = getBaseUrl();
+            const container = document.getElementById('cards-container');
+            container.innerHTML = machines.map(m => generateCard(m, baseUrl)).join('');
+        }
+
+        // Auto-detect base URL on load
+        (function init() {
+            const input = document.getElementById('base-url');
+            // If opened from the server, use that origin
+            if (window.location.hostname !== '' && window.location.protocol !== 'file:') {
+                input.value = window.location.origin;
+            } else {
+                input.value = 'http://localhost:3000';
+            }
+            regenerate();
+        })();
+    </script>
 </body>
 </html>
