@@ -70,11 +70,12 @@ async function main() {
 
   // --- Créer des récompenses ---
   const rewardsData = [
-    { name: 'Café Express Gratuit', description: 'Un café express offert au barista', pointsCost: 100, category: 'coffee' },
-    { name: 'Cappuccino Gratuit', description: 'Un cappuccino offert au barista', pointsCost: 150, category: 'coffee' },
-    { name: 'Réduction 10%', description: '10% de réduction sur votre prochaine commande', pointsCost: 50, category: 'discount' },
-    { name: 'Réduction 25%', description: '25% de réduction sur votre prochaine commande', pointsCost: 120, category: 'discount' },
-    { name: 'Sandwich Gratuit', description: 'Un sandwich offert au barista', pointsCost: 200, category: 'gift' },
+    { name: 'Café Gratuit', description: 'Un café offert — présentez le code au barista', pointsCost: 250, category: 'coffee' },
+    { name: 'Soda Gratuit', description: 'Un soda offert — présentez le code au barista', pointsCost: 300, category: 'drink' },
+    { name: 'Jus Gratuit', description: 'Un jus de fruits offert — présentez le code au barista', pointsCost: 350, category: 'drink' },
+    { name: 'Thé Glacé Gratuit', description: 'Un thé glacé offert — présentez le code au barista', pointsCost: 400, category: 'drink' },
+    { name: 'Glace Gratuite', description: 'Une glace offerte — présentez le code au barista', pointsCost: 450, category: 'gift' },
+    { name: 'Sandwich Gratuit', description: 'Un sandwich offert — présentez le code au barista', pointsCost: 500, category: 'gift' },
   ];
 
   for (const r of rewardsData) {

@@ -447,8 +447,8 @@ const App = {
                 <div class="stats-grid">
                     ${this.statCard('🎁', 'Total', rewards.length, 'récompenses', 'purple')}
                     ${this.statCard('☕', 'Café', rewards.filter(r => r.category === 'coffee').length, 'offres', 'orange')}
-                    ${this.statCard('💸', 'Réductions', rewards.filter(r => r.category === 'discount').length, 'offres', 'cyan')}
-                    ${this.statCard('🎉', 'Cadeaux', rewards.filter(r => r.category === 'gift').length, 'offres', 'green')}
+                    ${this.statCard('🥤', 'Boissons', rewards.filter(r => r.category === 'drink').length, 'offres', 'cyan')}
+                    ${this.statCard('🎁', 'Cadeaux', rewards.filter(r => r.category === 'gift').length, 'offres', 'green')}
                 </div>
                 <div class="data-table-wrapper"><table class="data-table">
                     <thead><tr><th>Récompense</th><th>Description</th><th>Catégorie</th><th>Coût</th><th>Statut</th></tr></thead>

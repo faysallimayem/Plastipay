@@ -177,8 +177,8 @@ class _RewardsScreenState extends State<RewardsScreen> {
   }
 
   Widget _rewardCard(Reward r) {
-    final catIcons = {'coffee': '☕', 'discount': '💸', 'gift': '🎉'};
-    final catColors = {'coffee': PlastiPayTheme.accentOrange, 'discount': PlastiPayTheme.accentCyan, 'gift': PlastiPayTheme.accentPurple};
+    final catIcons = {'coffee': '☕', 'drink': '🥤', 'discount': '💸', 'gift': '🎁'};
+    final catColors = {'coffee': PlastiPayTheme.accentOrange, 'drink': PlastiPayTheme.accentCyan, 'discount': PlastiPayTheme.bluePrimary, 'gift': PlastiPayTheme.accentPurple};
     final icon = catIcons[r.category] ?? '🎁';
     final color = catColors[r.category] ?? PlastiPayTheme.greenPrimary;
 
